@@ -481,7 +481,7 @@
             <span class="dot" style="background:var(--teal)"></span>Has: Human Statement only
           </button>
           <button class="state-btn" onclick="setState('orient-frame', this)">
-            <span class="dot" style="background:var(--green)"></span>Has: Orient + Frame
+            <span class="dot" style="background:var(--green)"></span>Has: Biz Problem + Human Problem
           </button>
           <button class="state-btn" onclick="setState('dc-only', this)">
             <span class="dot" style="background:var(--amber)"></span>Has: D&C only
@@ -513,7 +513,7 @@
         <div class="workshop-item" id="ws-orient" onclick="openWorkshop('orient')">
           <div class="ws-top">
             <div class="workshop-num" id="orient-num" style="background:var(--accent-glow);color:var(--accent)">1</div>
-            <span class="ws-name">Orient</span>
+            <span class="ws-name">Biz Problem</span>
             <span class="nav-badge badge-locked" id="orient-badge">—</span>
           </div>
           <div class="ws-desc">Business problem statement</div>
@@ -521,7 +521,7 @@
         <div class="workshop-item" id="ws-frame" onclick="openWorkshop('frame')">
           <div class="ws-top">
             <div class="workshop-num" id="frame-num" style="background:var(--teal-bg);color:var(--teal)">2</div>
-            <span class="ws-name">Frame</span>
+            <span class="ws-name">Human Problem</span>
             <span class="nav-badge badge-locked" id="frame-badge">—</span>
           </div>
           <div class="ws-desc">Human statement + user profiles</div>
@@ -529,7 +529,7 @@
         <div class="workshop-item" id="ws-dc" onclick="openWorkshop('dc')">
           <div class="ws-top">
             <div class="workshop-num" id="dc-num" style="background:var(--amber-bg);color:var(--amber)">3</div>
-            <span class="ws-name">Diverge & Converge</span>
+            <span class="ws-name">Evaluate & Prioritize</span>
             <span class="nav-badge badge-locked" id="dc-badge">—</span>
           </div>
           <div class="ws-desc">Concepts, features, scoring</div>
@@ -561,7 +561,7 @@
   <div class="annotation-group">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:8px;">Entry Points</div>
     <div class="annotation">
-      <strong>Any workshop can be the first:</strong> Orient, Frame, and Diverge &amp; Converge all show as "Start" when no prior context exists for that workshop. The numbered order (1, 2, 3) is a <em>suggested</em> path, not a gate.
+      <strong>Any workshop can be the first:</strong> Biz Problem, Human Problem, and Evaluate &amp; Prioritize all show as "Start" when no prior context exists for that workshop. The numbered order (1, 2, 3) is a <em>suggested</em> path, not a gate.
     </div>
   </div>
 
@@ -575,7 +575,7 @@
   <div class="annotation-group">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:8px;">D&C Without Prior Workshops</div>
     <div class="annotation">
-      <strong>"Has D&C only" state:</strong> A user who enters at Diverge &amp; Converge skips Orient and Frame entirely. Their D&C outputs still unlock the vibe coding prompt — a full business case is only partially available since it needs the problem statements.
+      <strong>"Has D&C only" state:</strong> A user who enters at Evaluate &amp; Prioritize skips Biz Problem and Human Problem entirely. Their D&C outputs still unlock the vibe coding prompt — a full business case is only partially available since it needs the problem statements.
     </div>
   </div>
 
@@ -594,7 +594,7 @@
         <li>How does a user import existing artifacts into a workshop?</li>
         <li>What does "partial" D&C look like (concepts scored but features not yet prioritized)?</li>
         <li>How does the dashboard communicate that skipped workshops can be added later?</li>
-        <li>Is the pro-forma always available post-Orient, or does it need financial inputs from a separate step?</li>
+        <li>Is the pro-forma always available post-Biz Problem, or does it need financial inputs from a separate step?</li>
       </ul>
     </div>
   </div>
@@ -620,7 +620,7 @@ const workshops = [
     cls: 'orient',
     icon: '🧭',
     num: '1',
-    name: 'Orient',
+    name: 'Biz Problem',
     desc: 'Rapidly establish a shared understanding of the business problem through AI-facilitated conversation.',
     outputs: [
       'Business problem statement',
@@ -628,7 +628,7 @@ const workshops = [
       'Success criteria',
     ],
     color: 'var(--accent)',
-    modalTitle: 'Orient Workshop',
+    modalTitle: 'Biz Problem Workshop',
     modalDesc: 'Define the business problem',
     mockArtifact: {
       title: 'Business Problem Statement',
@@ -640,7 +640,7 @@ const workshops = [
     cls: 'frame',
     icon: '🪟',
     num: '2',
-    name: 'Frame',
+    name: 'Human Problem',
     desc: 'Translate the business problem into human-centered problem statements and define the people most affected.',
     outputs: [
       'Human problem statement',
@@ -648,7 +648,7 @@ const workshops = [
       'Secondary user profiles',
     ],
     color: 'var(--teal)',
-    modalTitle: 'Frame Workshop',
+    modalTitle: 'Human Problem Workshop',
     modalDesc: 'Define the human problem and users',
     mockArtifact: {
       title: 'Human Problem Statement',
@@ -660,7 +660,7 @@ const workshops = [
     cls: 'dc',
     icon: '⚡',
     num: '3',
-    name: 'Diverge & Converge',
+    name: 'Evaluate & Prioritize',
     desc: 'Generate, score, and prioritize solution concepts and features. Produce a prompt ready for a vibe coding tool.',
     outputs: [
       'Scored solution concepts',
@@ -668,7 +668,7 @@ const workshops = [
       'Vibe coding prompt',
     ],
     color: 'var(--amber)',
-    modalTitle: 'Diverge & Converge',
+    modalTitle: 'Evaluate & Prioritize',
     modalDesc: 'Evaluate concepts and prioritize features',
     mockArtifact: {
       title: 'Top Concept',
@@ -686,7 +686,7 @@ const actions = [
     desc: 'Generate a structured prompt for Cursor, Lovable, or Replit that turns your prioritized concept into a prototype.',
     requires: { dc: true },
     requiresLabels: [
-      { key: 'dc',     label: 'Diverge & Converge complete' },
+      { key: 'dc',     label: 'Evaluate & Prioritize complete' },
     ],
     btnLabel: 'Generate Prompt',
     color: 'var(--accent)',
@@ -1052,9 +1052,9 @@ function showOutput(id) {
 function showContextMap() {
   const s = getState();
   const nodes = [
-    { id: 'orient', label: 'Orient',            status: s.orient ? 'done' : 'available' },
-    { id: 'frame',  label: 'Frame',             status: s.frame  ? 'done' : 'available' },
-    { id: 'dc',     label: 'Diverge & Converge',status: s.dc     ? 'done' : 'available' },
+    { id: 'orient', label: 'Biz Problem',            status: s.orient ? 'done' : 'available' },
+    { id: 'frame',  label: 'Human Problem',             status: s.frame  ? 'done' : 'available' },
+    { id: 'dc',     label: 'Evaluate & Prioritize',status: s.dc     ? 'done' : 'available' },
   ];
 
   const downstream = [
