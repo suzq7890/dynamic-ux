@@ -1,0 +1,47 @@
+name: Daily Price Check
+
+on:
+  schedule:
+    # 13:00 UTC = 7:00am CST (Central Standard Time, UTC-6).
+    # NOTE: GitHub Actions cron is always UTC and does not observe DST.
+    # During Central Daylight Time (roughly mid-March - early November) this
+    # will fire at 8:00am local time instead of 7:00am. If you'd rather it
+    # stay pinned to 7:00am local time year-round, change this to "0 12 * * *"
+    # for the DST portion of the year, or maintain two schedule entries.
+    - cron: "0 13 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  check-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+
+      - name: Apply database migrations
+        run: npm run db:migrate
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build shared package
+        run: npm run build --workspace=packages/shared
+
+      - name: Run daily price check
+        run: npm run scrape

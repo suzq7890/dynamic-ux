@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Site {
+  LOWES
+  HOME_DEPOT
+  BEST_BUY
+  FRIGIDAIRE
+}
+
+enum TrendType {
+  RISING
+  FALLING
+  VOLATILE
+}
+
+model Item {
+  id          String     @id @default(cuid())
+  name        String
+  modelNumber String
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  sites       ItemSite[]
+}
+
+model ItemSite {
+  id          String    @id @default(cuid())
+  itemId      String
+  item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  site        Site
+  // Direct product URL. If null, the scraper will attempt a best-effort
+  // site search using the item's model number and cache the result here.
+  productUrl  String?
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  lastCheckedAt         DateTime?
+  lastSaleNotifiedPrice  Decimal? @db.Decimal(10, 2)
+  lastSaleNotifiedAt     DateTime?
+
+  priceChecks PriceCheck[]
+  trendAlerts TrendAlert[]
+  predictions PricePrediction[]
+
+  @@unique([itemId, site])
+}
+
+model PriceCheck {
+  id           String   @id @default(cuid())
+  itemSiteId   String
+  itemSite     ItemSite @relation(fields: [itemSiteId], references: [id], onDelete: Cascade)
+  checkedAt    DateTime @default(now())
+
+  // Current selling price found on the page.
+  price        Decimal? @db.Decimal(10, 2)
+  // "Regular"/"was" price, when the site shows a strikethrough price.
+  listPrice    Decimal? @db.Decimal(10, 2)
+  isSale       Boolean  @default(false)
+  percentOff   Decimal? @db.Decimal(5, 2)
+  inStock      Boolean?
+
+  // Scrape outcome bookkeeping so failures are visible instead of silently
+  // gapping the history.
+  success      Boolean  @default(true)
+  errorMessage String?
+
+  @@index([itemSiteId, checkedAt])
+}
+
+model TrendAlert {
+  id            String    @id @default(cuid())
+  itemSiteId    String
+  itemSite      ItemSite  @relation(fields: [itemSiteId], references: [id], onDelete: Cascade)
+  trendType     TrendType
+  detectedAt    DateTime  @default(now())
+  description   String
+  fromPrice     Decimal?  @db.Decimal(10, 2)
+  toPrice       Decimal?  @db.Decimal(10, 2)
+  percentChange Decimal?  @db.Decimal(5, 2)
+  emailed       Boolean   @default(false)
+
+  @@index([itemSiteId, detectedAt])
+}
+
+model PricePrediction {
+  id             String   @id @default(cuid())
+  itemSiteId     String
+  itemSite       ItemSite @relation(fields: [itemSiteId], references: [id], onDelete: Cascade)
+  generatedAt    DateTime @default(now())
+  forDate        DateTime
+  predictedPrice Decimal  @db.Decimal(10, 2)
+  confidence     Decimal? @db.Decimal(5, 2)
+  method         String
+
+  @@index([itemSiteId, generatedAt])
+}
