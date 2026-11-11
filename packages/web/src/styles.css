@@ -130,3 +130,12 @@ button:disabled { opacity: 0.6; cursor: default; }
 button:hover:not(:disabled) { background: #2c3a4d; }
 
 .error { color: #b3261e; font-size: 13px; }
+
+/* Full-bleed photo background for any container: <div class="bg-meeting-room">…</div> */
+.bg-meeting-room {
+  background-color: #e9e9e9; /* shown while the image loads */
+  background-image: url("./assets/meeting-room.jpg");
+  background-size: cover;
+  background-position: 40% center; /* keeps the people at the table in frame when cropped */
+  background-repeat: no-repeat;
+}
