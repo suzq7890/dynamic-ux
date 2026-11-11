@@ -1,0 +1,80 @@
+/*
+ * Wormhole background: a pure-CSS take on a neon "hourglass" of light streaks
+ * (cyan / green / lime / violet) pinching into a glowing waist, with two dark
+ * elliptical voids carving out the left and right sides.
+ *
+ * Usage:  <div class="wormhole-bg"> ...your content... </div>
+ *         add `is-animated` for a gentle pulse.
+ * Tweak the custom properties below to retune colours or proportions.
+ */
+.wormhole-bg {
+  --wh-bg: #121a14;
+  --wh-cyan: 150, 255, 235;
+  --wh-green: 100, 235, 120;
+  --wh-lime: 220, 255, 100;
+  --wh-violet: 170, 135, 255;
+  --wh-void-w: 42%;   /* horizontal radius of each side void */
+  --wh-void-h: 44%;   /* vertical radius of each side void */
+  --wh-focus: 30%;    /* how far past the centre the streaks converge (bigger = wider waist) */
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    /* glowing rims along the void edges */
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 0% 50%,
+      transparent 95%, rgba(var(--wh-cyan), .22) 99.5%, transparent 103%),
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 100% 50%,
+      transparent 95%, rgba(var(--wh-cyan), .22) 99.5%, transparent 103%),
+    /* bright waist */
+    radial-gradient(ellipse 12% 26% at 50% 50%,
+      rgba(var(--wh-cyan), .45), rgba(var(--wh-green), .15) 60%, transparent 100%),
+    var(--wh-bg);
+}
+
+/* Streak layers: ::before = upper fan, ::after = lower fan */
+.wormhole-bg::before,
+.wormhole-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(from 0deg at 50% var(--wh-oy),
+      transparent 0deg 3.9deg, rgba(var(--wh-cyan), .95) 4.05deg, transparent 4.3deg),
+    repeating-conic-gradient(from 1.3deg at 50% var(--wh-oy),
+      transparent 0deg 5.5deg, rgba(var(--wh-green), .95) 5.65deg, transparent 5.9deg),
+    repeating-conic-gradient(from 2.1deg at 50% var(--wh-oy),
+      transparent 0deg 9.4deg, rgba(var(--wh-lime), .95) 9.55deg, transparent 9.7deg),
+    repeating-conic-gradient(from 3.4deg at 50% var(--wh-oy),
+      transparent 0deg 12.85deg, rgba(var(--wh-violet), .9) 12.95deg, transparent 13.1deg),
+    repeating-conic-gradient(from .7deg at 50% var(--wh-oy),
+      transparent 0deg 1.95deg, rgba(var(--wh-cyan), .3) 2.02deg, transparent 2.1deg);
+  /* keep one half, and cut the two side voids out of it */
+  -webkit-mask-image:
+    linear-gradient(var(--wh-dir), #000 44%, transparent 56%),
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 0% 50%, transparent 98%, #000 100.5%),
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 100% 50%, transparent 98%, #000 100.5%);
+  -webkit-mask-composite: source-in, source-in;
+          mask-image:
+    linear-gradient(var(--wh-dir), #000 44%, transparent 56%),
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 0% 50%, transparent 98%, #000 100.5%),
+    radial-gradient(ellipse var(--wh-void-w) var(--wh-void-h) at 100% 50%, transparent 98%, #000 100.5%);
+          mask-composite: intersect;
+  filter: blur(.4px) brightness(1.1);
+}
+.wormhole-bg::before { --wh-oy: calc(50% + var(--wh-focus)); --wh-dir: to bottom; }
+.wormhole-bg::after  { --wh-oy: calc(50% - var(--wh-focus)); --wh-dir: to top; }
+
+/* Optional gentle pulse (respects reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .wormhole-bg.is-animated::before,
+  .wormhole-bg.is-animated::after {
+    animation: wh-pulse 5s ease-in-out infinite;
+  }
+}
+@keyframes wh-pulse {
+  0%, 100% { opacity: .85; }
+  50%      { opacity: 1; }
+}
